@@ -18,11 +18,8 @@
     "allowJs": true,
     "noImplicitAny": true,
     "sourceMap": true,
-    "declaration": true,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "typeRoots": ["./node_modules/@types"]
+    "declaration": true
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "**/*.spec.ts"]
+  "exclude": ["src/**/*.test.ts", "src/test-utils/**/*", "node_modules"]
 }
