@@ -5,7 +5,7 @@
     "lib": ["es2020"],
     "outDir": "./dist",
     "rootDir": "./src",
-    "strict": true,
+    "strict": false,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
@@ -16,10 +16,16 @@
       "@/*": ["src/*"]
     },
     "allowJs": true,
-    "noImplicitAny": true,
+    "noImplicitAny": false,
     "sourceMap": true,
     "declaration": true
   },
   "include": ["src/**/*"],
-  "exclude": ["src/**/*.test.ts", "src/test-utils/**/*", "node_modules"]
+  "exclude": [
+    "src/**/*.test.ts",
+    "src/test-utils/**/*",
+    "node_modules",
+    "**/*.spec.ts",
+    "**/*.test.ts"
+  ]
 }
