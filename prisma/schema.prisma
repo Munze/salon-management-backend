@@ -1,0 +1,134 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Salon {
+  id        String   @id @default("default-salon")
+  name      String   @default("Default Salon")
+  address   String?
+  phone     String?
+  users     User[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model User {
+  id              String    @id @default(uuid())
+  email           String    @unique
+  password        String
+  name            String
+  phone           String?
+  role            UserRole  @default(THERAPIST)
+  salon           Salon     @relation(fields: [salonId], references: [id])
+  salonId         String    @default("default-salon")
+  resetToken      String?
+  resetTokenExpiry DateTime?
+  therapist       Therapist?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+model Client {
+  id           String        @id @default(uuid())
+  name         String
+  email        String        @unique
+  phone        String?
+  address      String?
+  notes        String?
+  appointments Appointment[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model Therapist {
+  id                 String               @id @default(uuid())
+  name               String
+  email              String               @unique
+  phone              String?
+  specialties        String[]
+  user               User                 @relation(fields: [userId], references: [id])
+  userId             String               @unique
+  appointments       Appointment[]
+  scheduleSettings   ScheduleSettings[]
+  scheduleExceptions ScheduleException[]
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+}
+
+model Appointment {
+  id           String    @id @default(uuid())
+  startTime    DateTime
+  endTime      DateTime
+  status       Status    @default(SCHEDULED)
+  notes        String?
+  client       Client    @relation(fields: [clientId], references: [id])
+  clientId     String
+  therapist    Therapist @relation(fields: [therapistId], references: [id])
+  therapistId  String
+  service      Service   @relation(fields: [serviceId], references: [id])
+  serviceId    String
+  price        Float
+  reminderSent Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model Service {
+  id           String        @id @default(uuid())
+  name         String        @unique
+  description  String?
+  duration     Int          // Duration in minutes
+  price        Float
+  isActive     Boolean      @default(true)
+  appointments Appointment[]
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+}
+
+model ScheduleSettings {
+  id           String    @id
+  dayOfWeek    String    // MONDAY, TUESDAY, etc.
+  startTime    String    // HH:mm format
+  endTime      String    // HH:mm format
+  isWorkingDay Boolean   @default(true)
+  therapist    Therapist @relation(fields: [therapistId], references: [id])
+  therapistId  String
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model ScheduleException {
+  id           String    @id @default(uuid())
+  date         DateTime
+  startTime    String?   // HH:mm format
+  endTime      String?   // HH:mm format
+  isWorkingDay Boolean   @default(true)
+  note         String?
+  therapist    Therapist @relation(fields: [therapistId], references: [id])
+  therapistId  String
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+enum UserRole {
+  ADMIN
+  THERAPIST
+  CLIENT
+}
+
+enum Status {
+  SCHEDULED
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
